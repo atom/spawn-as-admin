@@ -1,5 +1,8 @@
 # spawn-as-admin
 
+[![Build Status](https://travis-ci.org/atom/spawn-as-admin.svg?branch=master)](https://travis-ci.org/atom/spawn-as-admin)
+[![Build status](https://ci.appveyor.com/api/projects/status/idlwdrnp54iowr2d/branch/master?svg=true)](https://ci.appveyor.com/project/Atom/spawn-as-admin/branch/master)
+
 Run commands with administrator privileges
 
 ## Installing
