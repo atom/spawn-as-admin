@@ -17,13 +17,19 @@ npm install spawn-as-admin
 
 Launches a new process with the given `command`, and `arguments`.
 
-Returns an object with the following properties:
+Returns an `AdminProcess` object that implements a subset of node's `ChildProcess` API:
+
+#### Properties:
 
 * `pid` - The child process's process ID.
 * `stdin` - A `WritableStream` representing the process's standard input.
 * `stdout` - A `ReadableStream` representing the process's standard output.
 
-The returned object emits the following events:
+#### Methods:
+
+* `kill([signal])` - Sends the given `signal` to the child process. If no signal is specified, `SIGTERM` will be sent.
+
+#### Events:
 
 * `exit` - Emitted when the process exits, and passes the exit code of the process.
 
