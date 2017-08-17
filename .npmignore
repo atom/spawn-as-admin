@@ -1,7 +1,10 @@
 /build
 /spec
+/test
 *.coffee
 *.log
 *~
+.travis.yml
+appveyor.yml
 .node-version
 .npmignore
