@@ -19,6 +19,7 @@ Launches a new process with the given `command`, and `arguments`.
 
 Returns an object with the following properties:
 
+* `pid` - The child process's process ID.
 * `stdin` - A `WritableStream` representing the process's standard input.
 * `stdout` - A `ReadableStream` representing the process's standard output.
 

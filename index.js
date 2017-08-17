@@ -20,8 +20,6 @@ function resolveCommand (command) {
 class AdminProcess extends EventEmitter {
   constructor (pid, stdinFD, stdoutFD) {
     super()
-    this.stdinFD = stdinFD
-    this.stdoutFD = stdoutFD
     this.pid = pid
     this.stdin = stdinFD ? fs.createWriteStream(null, {fd: stdinFD}) : null
     this.stdout = stdoutFD ? fs.createReadStream(null, {fd: stdoutFD}) : null
