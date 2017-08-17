@@ -19,7 +19,6 @@ ChildProcess FAILURE = {nullptr, -1, -1, -1};
 
 }
 
-
 ChildProcess StartChildProcessWithoutPrivileges(const string &command, vector<char *> &argv) {
   int stdin_fds[2], stdout_fds[2];
   if (pipe(stdin_fds) == -1) return FAILURE;

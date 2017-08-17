@@ -43,13 +43,12 @@ suite('spawnAsAdmin', function () {
       let stdout = ''
       child.stdout.on('data', (data) => stdout += data.toString('utf8'))
 
-      child.stdin.write('hello!');
-      child.stdin.end();
+      fs.createReadStream(__filename).pipe(child.stdin)
 
       await new Promise(resolve => {
         child.on('exit', (code) => {
           assert.equal(code, 0)
-          assert.equal(stdout, 'hello!')
+          assert.equal(stdout, fs.readFileSync(__filename, 'utf8'))
           resolve()
         })
       })
