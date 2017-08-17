@@ -30,6 +30,10 @@ class AdminProcess extends EventEmitter {
       if (error.code !== 'EBADF') throw error
     })
   }
+
+  kill (signal) {
+    process.kill(this.pid, signal)
+  }
 }
 
 module.exports = function spawnAsAdmin (command, args = [], options = {}) {

@@ -33,6 +33,15 @@ suite('spawnAsAdmin', function () {
       })
     })
 
+    test('allows the child process to be killed', async () => {
+      const child = spawnAsAdmin(process.execPath, [], options)
+
+      await new Promise(resolve => {
+        child.on('exit', (code) => resolve())
+        child.kill()
+      })
+    })
+
   }
 
   if (process.platform === 'darwin') {
