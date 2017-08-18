@@ -17,23 +17,32 @@ function resolveCommand (command) {
   return command
 }
 
-class AdminProcess extends EventEmitter {
-  constructor (pid, stdinFD, stdoutFD) {
-    super()
-    this.pid = pid
-    this.stdin = stdinFD ? fs.createWriteStream(null, {fd: stdinFD}) : null
-    this.stdout = stdoutFD ? fs.createReadStream(null, {fd: stdoutFD}) : null
-    this.stderr = null
-    this.stdio = [this.stdin, this.stdout, this.stderr]
+// This class definition is deferred because it references EventEmitter which is not
+// available during V8 startup snapshot creation.
+let adminProcessClass
+function getAdminProcessClass () {
+  if (!adminProcessClass) {
+    adminProcessClass = class AdminProcessClass extends EventEmitter {
+      constructor (pid, stdinFD, stdoutFD) {
+        super()
+        this.pid = pid
+        this.stdin = stdinFD ? fs.createWriteStream(null, {fd: stdinFD}) : null
+        this.stdout = stdoutFD ? fs.createReadStream(null, {fd: stdoutFD}) : null
+        this.stderr = null
+        this.stdio = [this.stdin, this.stdout, this.stderr]
 
-    this.stdout.on('error', (error) => {
-      if (error.code !== 'EBADF') throw error
-    })
+        this.stdout.on('error', (error) => {
+          if (error.code !== 'EBADF') throw error
+        })
+      }
+
+      kill (signal) {
+        process.kill(this.pid, signal)
+      }
+    }
   }
 
-  kill (signal) {
-    process.kill(this.pid, signal)
-  }
+  return adminProcessClass
 }
 
 module.exports = function spawnAsAdmin (command, args = [], options = {}) {
@@ -52,6 +61,7 @@ module.exports = function spawnAsAdmin (command, args = [], options = {}) {
     throw new Error(`Failed to obtain root priveleges to run ${command}`)
   }
 
+  const AdminProcess = getAdminProcessClass()
   result = new AdminProcess(spawnResult.pid, spawnResult.stdin, spawnResult.stdout)
   return result
 }
