@@ -18,7 +18,7 @@
     "test": "mocha --ui=tdd test/*.test.js"
   },
   "dependencies": {
-    "nan": "2.x"
+    "nan": "^2.14.0"
   },
   "devDependencies": {
     "mocha": "^3.5.0"

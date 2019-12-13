@@ -33,7 +33,7 @@ void SpawnAsAdmin(const Nan::FunctionCallbackInfo<Value>& info) {
     return;
   }
 
-  std::string command(*String::Utf8Value(info[0]));
+  std::string command(*Nan::Utf8String(info[0]));
 
   if (!info[1]->IsArray()) {
     Nan::ThrowTypeError("Arguments must be an array");
@@ -50,7 +50,7 @@ void SpawnAsAdmin(const Nan::FunctionCallbackInfo<Value>& info) {
       return;
     }
 
-    args.push_back(std::string(*String::Utf8Value(js_arg)));
+    args.push_back(std::string(*Nan::Utf8String(js_arg)));
   }
 
   if (!info[2]->IsFunction()) {
@@ -73,7 +73,7 @@ void SpawnAsAdmin(const Nan::FunctionCallbackInfo<Value>& info) {
   Nan::AsyncQueueWorker(new Worker(new Nan::Callback(info[2].As<Function>()), child_process, test_mode));
 }
 
-void Init(Handle<Object> exports) {
+void Init(Local<Object> exports) {
   Nan::SetMethod(exports, "spawnAsAdmin", SpawnAsAdmin);
 }
 
