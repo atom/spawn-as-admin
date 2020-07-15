@@ -56,34 +56,36 @@ ChildProcess StartChildProcess(const std::string& command, const std::vector<std
   for (size_t i = 0; i < args.size(); ++i)
     parameters += QuoteCmdArg(args[i]) + ' ';
 
-  auto shell_execute_info = new SHELLEXECUTEINFO{};
-  shell_execute_info->cbSize = sizeof(*shell_execute_info);
-  shell_execute_info->fMask = SEE_MASK_NOASYNC | SEE_MASK_NOCLOSEPROCESS;
-  shell_execute_info->lpVerb = test_mode ? "open" : "runas";
-  shell_execute_info->lpFile = command.c_str();
-  shell_execute_info->lpParameters = parameters.c_str();
-  shell_execute_info->nShow = SW_NORMAL;
+  SHELLEXECUTEINFO shell_execute_info = {};
+  shell_execute_info.cbSize = sizeof(shell_execute_info);
+  shell_execute_info.fMask = SEE_MASK_NOASYNC | SEE_MASK_NOCLOSEPROCESS;
+  shell_execute_info.lpVerb = test_mode ? "open" : "runas";
+  shell_execute_info.lpFile = command.c_str();
+  shell_execute_info.lpParameters = parameters.c_str();
+  shell_execute_info.nShow = SW_NORMAL;
 
-  if (::ShellExecuteEx(shell_execute_info) == FALSE || shell_execute_info->hProcess == NULL) {
+  if (::ShellExecuteEx(&shell_execute_info) == FALSE || shell_execute_info.hProcess == NULL) {
     return {nullptr, -1, -1, -1};
   }
 
-  int pid = GetProcessId(shell_execute_info->hProcess);
+  int pid = GetProcessId(shell_execute_info.hProcess);
 
-  return {shell_execute_info, pid, -1, -1};
+  return {shell_execute_info.hProcess, pid, -1, -1};
 }
 
 int WaitForChildProcessToExit(ChildProcess *child_process, bool test_mode) {
-  auto shell_execute_info = static_cast<SHELLEXECUTEINFO *>(child_process->payload);
-
   // Wait for the process to complete.
-  ::WaitForSingleObject(shell_execute_info->hProcess, INFINITE);
+  auto process = static_cast<HANDLE>(child_process->payload);
+  if (!process) {
+    return -1;
+  }
+
+  ::WaitForSingleObject(process, INFINITE);
 
   DWORD code;
-  if (::GetExitCodeProcess(shell_execute_info->hProcess, &code) == 0)
-    return -1;
-
-  return code;
+  const bool failed = ::GetExitCodeProcess(process, &code) == 0;
+  CloseHandle(process);
+  return failed ? -1 : code;
 }
 
 }  // namespace spawn_as_admin
