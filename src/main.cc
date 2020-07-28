@@ -44,7 +44,7 @@ void SpawnAsAdmin(const Nan::FunctionCallbackInfo<Value>& info) {
   std::vector<std::string> args;
   args.reserve(js_args->Length());
   for (uint32_t i = 0; i < js_args->Length(); ++i) {
-    Local<Value> js_arg = js_args->Get(i);
+    Local<Value> js_arg = js_args->Get(Nan::GetCurrentContext(), i).ToLocalChecked();
     if (!js_arg->IsString()) {
       Nan::ThrowTypeError("Arguments must be an array of strings");
       return;
@@ -65,9 +65,9 @@ void SpawnAsAdmin(const Nan::FunctionCallbackInfo<Value>& info) {
   if (child_process.pid == -1) return;
 
   Local<Object> result = Nan::New<Object>();
-  result->Set(Nan::New("pid").ToLocalChecked(), Nan::New<Integer>(child_process.pid));
-  result->Set(Nan::New("stdin").ToLocalChecked(), Nan::New<Integer>(child_process.stdin_file_descriptor));
-  result->Set(Nan::New("stdout").ToLocalChecked(), Nan::New<Integer>(child_process.stdout_file_descriptor));
+  result->Set(Nan::GetCurrentContext(), Nan::New("pid").ToLocalChecked(), Nan::New<Integer>(child_process.pid));
+  result->Set(Nan::GetCurrentContext(), Nan::New("stdin").ToLocalChecked(), Nan::New<Integer>(child_process.stdin_file_descriptor));
+  result->Set(Nan::GetCurrentContext(), Nan::New("stdout").ToLocalChecked(), Nan::New<Integer>(child_process.stdout_file_descriptor));
   info.GetReturnValue().Set(result);
 
   Nan::AsyncQueueWorker(new Worker(new Nan::Callback(info[2].As<Function>()), child_process, test_mode));
